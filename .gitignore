@@ -1,0 +1,9 @@
+dataset/*
+dataset
+frames/*
+frames
+generative_models/*
+generative_models
+image_segmentation/weights/model.h5
+hrnet/weights/pose_hrnet_w48_384x288.pth
+openpose/model/body_pose_model.pth
