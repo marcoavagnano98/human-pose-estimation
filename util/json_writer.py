@@ -22,7 +22,8 @@ class Writer():
         self.f = open(filename, "w")
     
     def buffer_data(self, image_id, keypoints):
-        self.buffer["annotations"].append({"image_id": image_id, "keypoints": keypoints})
+     #   self.buffer["annotations"].append({"image_id": image_id, "keypoints": keypoints})
+         self.buffer["annotations"].append({image_id : keypoints})
 
     def is_open(self):
         return self.f and not self.f.closed
@@ -32,3 +33,19 @@ class Writer():
         json.dump(self.buffer, self.f)
         self.f.close()
         self._init_buffer()
+
+class Reader():
+    def __init__(self):
+        self.f = None
+        self.data = None
+
+    def load_file(self, fname):
+        self.f = fname
+        with open(fname, "r") as f:
+            data = json.load(f)
+        self.metadata, self.annotations = data["metadata"], data["annotations"]
+
+
+    def get_keypoints(self, id):
+       return self.annotations[id]
+        

@@ -96,3 +96,6 @@ def black_to_gray():
   image = np.where(image == 0, image1, image)
   cv2.imshow("", image)
   cv2.waitKey(0)
+
+def get_image_id(image_path):
+  return image_path.split("/")[-1][:-4]
