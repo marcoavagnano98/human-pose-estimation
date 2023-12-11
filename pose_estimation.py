@@ -7,7 +7,7 @@ from util.skeletons import *
 import argparse
 import random
 import os
-from util.json_writer import Writer
+from util.json_writer import *
 from pathlib import Path
 
 parser = argparse.ArgumentParser(prog="Human Pose Estimation")
@@ -30,6 +30,7 @@ class HumanPoseEstimation():
     def __init__(self, estimator, dataset_size):
         self.dir = pathlib.Path(__file__).parent.resolve() 
         self.writer = Writer()
+        self.reader = Reader()
         self.image_counter = 0
         self.dataset_size = dataset_size
         self.estimator = estimator
@@ -79,25 +80,25 @@ class HumanPoseEstimation():
                 self.writer.begin(fname)
             
             self.writer.buffer_data(image_id, keypoints)
-        
-     
-           
     
-        
+    def read_keypoints(self, image_id):
+        return self.reader.get_keypoints(image_id)
+
+
 
     def test(self, cut, image_path, show = False):
+        """
+        id = get_image_id(image_path)
+        keypoints = self.read_keypoints(id)
+        print(keypoints)
+        return 0
+        """
         gt_image = cv2.imread(image_path)
         gt_image = cv2.cvtColor(gt_image, cv2.COLOR_BGR2RGB)
         _, gtw, _ = gt_image.shape
         #assert gt_image.shape == predicted.shape
         kp_true = self.get_keypoints(gt_image)[0]
-        """
-        if cut == -1:
-            y = 0
-            cut = 0
-        else:
-            y = kp_true[get_coco_keypoint(self.skeleton, cut)][0]
-        """        
+
         # cut the image on given kpoint y
         predicted = custom_cut(gt_image.copy(), cut, kp_true)#add_patch(gt_image.copy(), 0,0, int(y), gtw)
         kp_predicted = self.get_keypoints(predicted)[0]
@@ -121,5 +122,5 @@ if __name__ == "__main__":
             for img in files:
                 print(img)
                 image_path = os.path.join(folder_p,img)
-                #print(hpe.test(cut="bottom_hips", image_path=image_path, show=False))    
+                print(hpe.test(cut="bottom_hips", image_path=image_path, show=False))    
             
