@@ -53,12 +53,16 @@ def get_pixel_from_percent(dims, x, y):
 
 def custom_cut(image, cut_type, keypoints):
   # neck type: we have to get a middle point between head and shoulder (0, min(rshoulder, left_shoulder))
+  kp_start = 0
   h, w, _ = image.shape
   if cut_type == "neck":
     y1, y2 = keypoints[0][0], min(keypoints[5][0], keypoints[6][0])
     y = np.mean([y1, y2])
+    kp_start = 5
+
   if cut_type == "shoulder":
      y = max(keypoints[5][0], keypoints[6][0])
+     kp_start = 7
 
   if cut_type == "chest" or cut_type == "above_hips":
     y1, y2 = max(keypoints[5][0], keypoints[6][0]), min(keypoints[11][0], keypoints[12][0])
@@ -69,6 +73,7 @@ def custom_cut(image, cut_type, keypoints):
       y = y_mean - shift
     else:
       y = y_mean + shift
+    kp_start = 11  
       
   if cut_type == "bottom_hips" or cut_type == "above_knee":
     y1, y2 = min(keypoints[11][0], keypoints[12][0]), max(keypoints[13][0], keypoints[14][0])
@@ -78,14 +83,15 @@ def custom_cut(image, cut_type, keypoints):
 
     if cut_type == "bottom_hips":
       y = y_mean - shift
+  
     else:
       y = y_mean + shift
-     
-
-
+    
+    kp_start = 13
 
   image = add_patch(image, 0, 0, int(y), w)
-  return image
+
+  return image, kp_start
      
 def black_to_gray():
   import cv2
@@ -98,4 +104,4 @@ def black_to_gray():
   cv2.waitKey(0)
 
 def get_image_id(image_path):
-  return image_path.split("/")[-1][:-4]
+  return os.path.basename(image_path)[:-4]

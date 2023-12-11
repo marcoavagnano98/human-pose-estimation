@@ -14,6 +14,7 @@ class DeepSegmentation():
         self.H = 512
         self.W = 512
         self.smooth = 1e-15
+        tf.config.experimental.set_visible_devices([], 'GPU')
         parent = pathlib.Path(__file__).parent.resolve()
         model_p = f"{parent}/weights/model.h5"
         with CustomObjectScope({'iou': self.iou, 'dice_coef': self.dice_coef, 'dice_loss': self.dice_loss}):

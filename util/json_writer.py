@@ -43,9 +43,13 @@ class Reader():
         self.f = fname
         with open(fname, "r") as f:
             data = json.load(f)
-        self.metadata, self.annotations = data["metadata"], data["annotations"]
+
+        if not self.data:
+            self.data = data
+        else:
+            self.data.update(data)    
 
 
     def get_keypoints(self, id):
-       return self.annotations[id]
+       return self.data[id]
         
