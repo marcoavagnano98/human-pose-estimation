@@ -7,6 +7,7 @@ import collections
 import pathlib
 from util.skeletons import *
 from util.process_image import *
+from util.json_writer import *
 
 class HPEvaluator():
     def __init__(self,skeleton="coco"):
@@ -72,4 +73,32 @@ class HPEvaluator():
            res[name] = eucl / div_factor
 
         return {"mean": np.mean(list(res.values())), "scores": res}
-           
+    
+    def pck(self, gt_kps, pred_kps, tsld = 2.5):
+            pck = 0
+            for gt, pred in zip(gt_kps, pred_kps):
+
+                for p, t in zip(pred, gt):
+                    x1, y1, x2, y2 = (p[0],p[1], t[0], t[1])
+                    if math.dist((x1, y1), (x2, y2)) <= tsld:
+                        pck += 1
+            return pck / (len(gt_kps) * 17)
+
+if __name__ == "__main__":
+    print("Entro")
+    e = HPEvaluator()
+    gt_path = "/home/marco/technogym/technogym/annotations/testset/keypoints.json"
+    pred_path = "/home/marco/technogym/technogym/annotations/testset/keypoints.json"
+    gt_reader, pred_reader = Reader(), Reader()
+    gt_reader.load_file(gt_path)
+    pred_reader.load_file(pred_path)
+    pck_len = 0
+    pred_kps = []
+    gt_kps = []
+    for gt_item, pred_item in zip(gt_reader.data.items(), pred_reader.data.items()):
+        if gt_item[0] == "metadata":
+            continue
+        pred_kps.append(pred_item[1])
+        gt_kps.append(gt_item[1])
+    pck = e.pck(gt_kps, pred_kps)
+    print(pck)

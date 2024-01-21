@@ -53,6 +53,8 @@ def get_pixel_from_percent(dims, x, y):
 
 def custom_cut(image, cut_type, keypoints):
   # neck type: we have to get a middle point between head and shoulder (0, min(rshoulder, left_shoulder))
+  if not cut_type:
+    return image, 0
   kp_start = 0
   h, w, _ = image.shape
   if cut_type == "neck":

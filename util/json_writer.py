@@ -49,7 +49,6 @@ class Reader():
         else:
             self.data.update(data)    
 
-
     def get_keypoints(self, id):
        return self.data[id]
         

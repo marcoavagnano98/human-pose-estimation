@@ -88,7 +88,7 @@ class HumanPoseEstimation():
             self.writer.buffer_data(image_id, keypoints)
             self.writer.close()
         else:
-            if self.image_counter % limit == 0:
+            if self.image_counter == 0:
                 if self.writer.is_open():
                     self.writer.close()
                 fname = f"{self.image_counter}-{(self.image_counter + limit) - 1}.json"
@@ -121,22 +121,24 @@ class HumanPoseEstimation():
             kp_true = np.array(self.get_keypoints_from_file(image_id))
 
         # cut the image on given kpoint y
-        predicted, kp_start = custom_cut(gt_image.copy(), cut, kp_true)
-        kp_predicted = self.get_keypoints(predicted)[0]
-
+     #   predicted, kp_start = custom_cut(gt_image.copy(), cut, kp_true)
+     #   kp_predicted = self.get_keypoints(predicted)[0]
+        """
         if show:
             # map skeleton of current HPE estimator to coco skeleton
             true_to_show, preds_to_show = map_to_coco(self.skeleton, kp_true.copy(), kp_predicted.copy())
             self.show_diff(gt_image, predicted, true_to_show, preds_to_show)
+        """
         if self.write:
             self.handle_write(image_id, kp_true.tolist())
         self.image_counter += 1
 
         # EVALUATION 
-
+        """
         oks = self.evaluator.oks(gt_image, kp_start, kp_predicted, kp_true)
         euclidean_dist = self.evaluator.euclidean_dist(gt_image.shape[:2], kp_predicted, kp_true)
         print(oks)
+        """
     
 
 
@@ -144,12 +146,14 @@ if __name__ == "__main__":
     if args.test:
         folder_p = args.folder if args.folder else DEFAULT_PATH
         estimators = ["hrnet", "openpose", "movenet", "mediapipe"] if args.estimators == "all" else process_args(args.estimators)
+        if args.cut:
+            cut = args.cut    
         for estimator  in estimators:
             files = list(os.listdir(folder_p))
             hpe = HumanPoseEstimation(estimator=estimator, dataset_size=len(files), write = args.write, read = args.read)
             files.sort()
+
             for img in files:
                 print(img)
                 image_path = os.path.join(folder_p,img)
-                print(hpe.test(cut="bottom_hips", image_path=image_path, show=args.show))    
-            
+                print(hpe.test(cut=args.cut, image_path=image_path, show=args.show))
